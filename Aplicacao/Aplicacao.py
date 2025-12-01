@@ -1,3 +1,9 @@
+#Daniel Umeda Kuhn - 13676541
+#Gustavo Curado Ribeiro - 14576732
+#Luís Filipe Silva Forti - 14592348
+#Manoel Thomaz Gama da Silva Neto - 13676392
+#Pedro Fuziwara Filho - 13676840
+
 import oracledb
 from tabulate import tabulate
 import re
@@ -27,7 +33,7 @@ def VerificaCPF(cpf):
     #Para confirmar os digítos verificadores
     #https://www.cadcobol.com.br/calcula_cpf_cnpj_caepf.htm
 
-    #Tira tudo que não for número
+    #Substitui tudo que não for número por ""
     #\d == numeros
     #\D == tudo - \d
     numeros = re.sub(r"\D", "", cpf)
@@ -764,16 +770,16 @@ if __name__ == "__main__":
     load_dotenv()
 
     #Pega os dados do .env
-    db_user = os.getenv("user")
-    db_pass = os.getenv("password")
     db_host = os.getenv("host")
     db_port = os.getenv("port")
     db_service = os.getenv("service_name")
+    db_user = os.getenv("user")
+    db_pass = os.getenv("password")
 
     #Se algum dado estiver faltando (ou o .env em si)
-    if not all([db_user, db_pass, db_host, db_port, db_service]):
+    if not all([db_host, db_port, db_service, db_user, db_pass]):
         print("\n[ERRO] Arquivo .env incompleto!\n")
-        print("Verifique: user, password, host, port, service_name\n")
+        print("Verifique: host, port, service_name, user, password\n")
         exit()
 
     dsn = oracledb.makedsn(host=db_host, port=db_port, service_name=db_service)

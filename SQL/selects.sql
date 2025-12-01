@@ -109,7 +109,5 @@ AND INSTR(A.AUTORIZACAO_SNT, O.TIPO) > 0
 AND C.DATA_HORARIO_INICIO < A.VALIDADE_AUTORIZACAO
 WHERE A.HOSPITAL IS NULL;
 
-SELECT * FROM AUTORIZACAO_HOSPITAL;
-
 --Nota: pode acontecer que um hospital realize uma cirurgia não autorizada, mas renove sua autorização depois
 --Nesse caso, a informação de que a cirurgia foi realizada indevidamente será perdida da base de dados
