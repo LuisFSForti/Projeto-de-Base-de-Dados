@@ -54,10 +54,10 @@ Com todas as configurações feitas, execute:
 
 * Daniel Umeda Kuhn - 13676541
 
-* Gustavo Curado Ribeiro - 14576732
+* [Gustavo Curado Ribeiro](https://github.com/GustavoCurado) - 14576732
 
-* Luís Filipe Silva Forti - 14592348
+* [Luís Filipe Silva Forti](https://github.com/LuisFSForti) - 14592348
 
-* Manoel Thomaz Gama da Silva Neto - 13676392
+* [Manoel Thomaz Gama da Silva Neto](https://github.com/thneto1103) - 13676392
 
-* Pedro Fuziwara Filho - 13676840
+* [Pedro Fuziwara Filho](https://github.com/fuzao-jbl) - 13676840
