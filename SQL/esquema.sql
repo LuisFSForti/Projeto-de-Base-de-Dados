@@ -71,6 +71,8 @@ CREATE TABLE PESSOA(
     CONSTRAINT CK_PESSOA_RUA_UPPER CHECK(UPPER(RUA) = RUA),
     
     CONSTRAINT CK_PESSOA_NUMERO_POSITIVO CHECK(NUMERO > 0),
+    --Todos os telefones começam com 9 pois registram apenas números de telefones celular
+    --Optou-se por fazer assim pois o uso de números fixos atualmente é consideravelmente raro
     CONSTRAINT CK_PESSOA_TELEFONE1 CHECK(TELEFONE1 IS NULL OR REGEXP_LIKE(TELEFONE1, '\([0-9]{2}\)9[0-9]{4}\-[0-9]{4}')),
     CONSTRAINT CK_PESSOA_TELEFONE2 CHECK(TELEFONE2 IS NULL OR REGEXP_LIKE(TELEFONE2, '\([0-9]{2}\)9[0-9]{4}\-[0-9]{4}'))
 );
@@ -135,6 +137,7 @@ CREATE TABLE PACIENTE(
     CONSTRAINT CK_PACIENTE_COR CHECK(COR IN ('BRANCO', 'PRETO', 'PARDO', 'AMARELO', 'INDIGENA')),
     CONSTRAINT CK_PACIENTE_PESO_POSITIVO CHECK(PESO > 0),
     
+    --Optou-se por fazer assim pois o uso de números fixos atualmente é consideravelmente raro
     CONSTRAINT CK_PACIENTE_TELEFONE_EMERGENCIA1 CHECK(TELEFONE_EMERGENCIA1 IS NULL OR REGEXP_LIKE(TELEFONE_EMERGENCIA1, '\([0-9]{2}\)9[0-9]{4}\-[0-9]{4}')),
     CONSTRAINT CK_PACIENTE_TELEFONE_EMERGENCIA2 CHECK(TELEFONE_EMERGENCIA2 IS NULL OR REGEXP_LIKE(TELEFONE_EMERGENCIA2, '\([0-9]{2}\)9[0-9]{4}\-[0-9]{4}'))
 );
@@ -169,6 +172,8 @@ CREATE TABLE HOSPITAL(
     RUA VARCHAR2(30) NOT NULL,
     --5 caracteres, 0 decimais
     NUMERO NUMBER(5, 0) NOT NULL,
+    --4 digítos para o número de sala, não terá situações com mais de 10000 salas num único hospital
+    --O próprio número é um chute alto, arriscando que existam hospitais com 1000 salas
     NUMERO_SALAS_INTERNACAO NUMBER(4,0),
     NUMERO_SALAS_CIRURGIA NUMBER(4,0),
     
@@ -200,13 +205,14 @@ CREATE TABLE HOSPITAL(
 
 CREATE TABLE LABORATORIO(
     --Assumindo que todo hospital tem 10 laboratórios, que já é uma extrapolação grande
-    --raw(6) -> 281.474 trilhões de combinações, mais de 3.914 bilhões de opções pra cada hospital
+    --raw(6) -> 281.474 trilhões de combinações, mais de 3.914 bilhões de opções pra cada laboratório
     --Impossível de adivinhar, chance minúscula de colisões
     --substr(1,12) porque ele corta o texto de SYS_GUID(), que está em hexa (dobro dos caracteres)
     ID RAW(6) DEFAULT SUBSTR(SYS_GUID(), 1, 12) NOT NULL,
     HOSPITAL RAW(6) NOT NULL,
     NOME VARCHAR2(30) NOT NULL,
     --DAY(0) e SECOND(0) impedem valores fracionários
+    --Optou-se por usar INTERVAL pois prioriza o horário sobre a data, que é mais relevante
     ABERTURA INTERVAL DAY(0) TO SECOND(0) NOT NULL,
     FECHAMENTO INTERVAL DAY(0) TO SECOND(0) NOT NULL,
     ESTADO VARCHAR2(2) NOT NULL,
@@ -251,7 +257,7 @@ CREATE TABLE LABORATORIO(
 
 CREATE TABLE SALA(
     HOSPITAL RAW(6) NOT NULL,
-    --Deve ter o mesmo tamanho do número de salas máximo do hospital
+    --Talvez precise aumentar, dependendo da forma que hospitais registrem suas salas
     NUMERO NUMBER(4,0) NOT NULL,
     --DAY(0) e SECOND(0) impedem valores fracionários
     TEMPO_HIGIENIZACAO INTERVAL DAY(0) TO SECOND(0) NOT NULL,
@@ -357,6 +363,9 @@ CREATE TABLE EXAME(
     CONSTRAINT FK_EXAME_LABORATORIO FOREIGN KEY(LABORATORIO) REFERENCES LABORATORIO(ID),
     CONSTRAINT FK_EXAME_TIPO FOREIGN KEY(TIPO) REFERENCES TIPOS_EXAME(TIPO),
     CONSTRAINT FK_EXAME_MEDICO_SUPERVISOR FOREIGN KEY(MEDICO_SUPERVISOR) REFERENCES MEDICO(FUNCIONARIO),
+    
+    --Restrição de integridade: médico não pode ser paciente do exame que está supervisionando
+    CONSTRAINT CK_EXAME_PACIENTE_DIFERENTE_MEDICO CHECK(PACIENTE != MEDICO_SUPERVISOR),
     
     CONSTRAINT CK_EXAME_RESULTADO_UPPER CHECK(UPPER(RESULTADO) = RESULTADO)
 );
@@ -486,5 +495,3 @@ CREATE TABLE EQUIPAMENTO_SALA_CIRURGICA(
     
     CONSTRAINT CK_EQUIPAMENTO_SALA_CIRURGICA_QUANTIDADE_POSITIVA CHECK(QUANTIDADE > 0)
 );
-
---SELECT 'DROP TABLE '||TABLE_NAME||' CASCADE CONSTRAINTS;' FROM USER_TABLES;
